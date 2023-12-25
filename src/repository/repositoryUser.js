@@ -16,7 +16,11 @@ export function repositoryUser() {
             console.error('Error occured:', error);
         });
         
-        return res.data;
+        if(res){
+            return res.data; 
+        }
+
+        return null;
     };
 
     return {registerUser: registerUser}
