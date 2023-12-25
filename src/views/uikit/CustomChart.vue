@@ -2,7 +2,9 @@
 import { ref, watch } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { repositoryPost } from '@/repository/repositoryPost';
+import { useRoute } from 'vue-router'
 
+const route = useRoute();
 const { getLitePostById } = repositoryPost();
 const { layoutConfig } = useLayout();
 let documentStyle = getComputedStyle(document.documentElement);
@@ -22,7 +24,7 @@ const setColorOptions = () => {
 };
 
 const setChart = async () => {
-    let res = await getLitePostById(4);
+    let res = await getLitePostById(route.params.id);
     title = res.title;
 
     pieData.value = {
@@ -47,7 +49,6 @@ const setChart = async () => {
         }
     };
 };
-
 watch(
     layoutConfig.theme,
     () => {
@@ -56,6 +57,7 @@ watch(
     },
     { immediate: true }
 );
+
 </script>
 
 <template>
