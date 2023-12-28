@@ -5,6 +5,14 @@ import AppMenuItem from './AppMenuItem.vue';
 
 const model = ref([
     {
+        label: 'Menu',
+        items: [
+            { label: 'Pool hub', icon: 'pi pi-fw pi-home', to: '/PoolHub' },
+            { label: 'Create pool', icon: 'pi pi-fw pi-home', to: '/CreatePool' },
+            { label: 'Sign up', icon: 'pi pi-fw pi-home', to: '/auth/SignUp' },
+        ]
+    },
+    {
         label: 'Home',
         items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
     },
