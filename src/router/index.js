@@ -112,9 +112,14 @@ const router = createRouter({
                     component: () => import('@/views/uikit/CustomChart.vue')
                 },
                 {
-                    path: '/uikit/poolhub',
+                    path: '/poolhub',
                     name: 'poolhub',
                     component: () => import('@/views/uikit/PoolHub.vue')
+                },
+                {
+                    path: '/createpool',
+                    name: 'createpool',
+                    component: () => import('@/views/uikit/CreatePool.vue')
                 },
                 {
                     path: '/uikit/misc',
