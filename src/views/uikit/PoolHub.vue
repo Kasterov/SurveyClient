@@ -13,13 +13,9 @@ let textColor = documentStyle.getPropertyValue('--text-color');
 const checkboxValue = ref([]);
 const dataviewValue = ref(null);
 const layout = ref('grid');
-const sortKey = ref(null);
+
 const sortOrder = ref(null);
 const sortField = ref(null);
-const sortOptions = ref([
-    { label: 'Price High to Low', value: '!price' },
-    { label: 'Price Low to High', value: 'price' }
-]);
 
 const poolOptionsModal = ref(null);
 
@@ -129,8 +125,8 @@ onMounted(async () => {
             datasets: [
                 {
                     data: pool.votes.map(x => x.count),
-                    backgroundColor: [documentStyle.getPropertyValue('--indigo-500'), documentStyle.getPropertyValue('--purple-500'), documentStyle.getPropertyValue('--teal-500'),  documentStyle.getPropertyValue('--red-500')],
-                    hoverBackgroundColor: [documentStyle.getPropertyValue('--indigo-400'), documentStyle.getPropertyValue('--purple-400'), documentStyle.getPropertyValue('--teal-400'),  documentStyle.getPropertyValue('--red-500')]
+                    backgroundColor: [documentStyle.getPropertyValue('--indigo-800'), documentStyle.getPropertyValue('--teal-600'), documentStyle.getPropertyValue('--primary-600'),  documentStyle.getPropertyValue('--purple-800')],
+                    hoverBackgroundColor: [documentStyle.getPropertyValue('--indigo-700'), documentStyle.getPropertyValue('--teal-500'), documentStyle.getPropertyValue('--primary-500'),  documentStyle.getPropertyValue('--purple-700')]
                 }
             ],
         }; 

@@ -32,7 +32,7 @@ const createUserDTO = async () => {
     }
 
     let res = await createPost(createPostDTO);
-    
+
     if(res) {
         router.push({ path: '/poolhub' });
     }

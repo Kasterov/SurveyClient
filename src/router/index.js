@@ -117,6 +117,11 @@ const router = createRouter({
                     component: () => import('@/views/uikit/PoolHub.vue')
                 },
                 {
+                    path: '/poolmenu',
+                    name: 'poolmenu',
+                    component: () => import('@/views/uikit/PoolMenu.vue')
+                },
+                {
                     path: '/createpool',
                     name: 'createpool',
                     component: () => import('@/views/uikit/CreatePool.vue')
@@ -170,9 +175,9 @@ const router = createRouter({
         },
 
         {
-            path: '/auth/login',
-            name: 'login',
-            component: () => import('@/views/pages/auth/Login.vue')
+            path: '/auth/signIn',
+            name: 'signIn',
+            component: () => import('@/views/pages/auth/SignIn.vue')
         },
 
         {

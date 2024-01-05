@@ -7,9 +7,11 @@ const model = ref([
     {
         label: 'Menu',
         items: [
-            { label: 'Pool hub', icon: 'pi pi-fw pi-home', to: '/PoolHub' },
-            { label: 'Create pool', icon: 'pi pi-fw pi-home', to: '/CreatePool' },
-            { label: 'Sign up', icon: 'pi pi-fw pi-home', to: '/auth/SignUp' },
+            { label: 'Pool hub', icon: 'pi pi-fw pi-home', to: '/poolHub' },
+            { label: 'Pool menu', icon: 'pi pi-fw pi-home', to: '/poolmenu' },
+            { label: 'Create pool', icon: 'pi pi-fw pi-home', to: '/createPool' },
+            { label: 'Sign in', icon: 'pi pi-fw pi-home', to: '/auth/signIn' },
+            { label: 'Sign up', icon: 'pi pi-fw pi-home', to: '/auth/signUp' },
         ]
     },
     {
