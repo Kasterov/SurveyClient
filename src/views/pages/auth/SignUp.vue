@@ -93,6 +93,11 @@ const logoUrl = computed(() => {
                             <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
                         </div> -->
                         <Button :onClick="createUserDTO" label="Sign Up" class="w-full p-3 text-xl"></Button>
+                        <div class="text-center mt-5">
+                        <!-- <img src="/demo/images/login/avatar.png" alt="Image" height="50" class="mb-3" /> -->
+                        <Button :onclick="() => router.push({ path: 'signin' })" label="I have an account" class="p-button-info p-button-text mr-2 mb-2" />
+                        <!-- <span class="text-600 font-medium">Sign up to continue</span> -->
+                    </div>
                     </div>
                 </div>
             </div>

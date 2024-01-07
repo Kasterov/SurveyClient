@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
+import store from '@/store';
 
 const { layoutConfig, onMenuToggle } = useLayout();
 
@@ -22,6 +23,7 @@ const logoUrl = computed(() => {
 });
 
 const onTopBarMenuButton = () => {
+    store.dispatch('clearToken');
     topbarMenuActive.value = !topbarMenuActive.value;
 };
 const onSettingsClick = () => {
@@ -64,7 +66,7 @@ const isOutsideClicked = (event) => {
     <div class="layout-topbar">
         <router-link to="/" class="layout-topbar-logo">
             <!-- <img :src="logoUrl" alt="logo" /> -->
-            <span>Survery</span>
+            <span>Survey</span>
         </router-link>
 
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">

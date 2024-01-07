@@ -1,11 +1,41 @@
 import axios from 'axios';
 import store from '@/store';
+import router from '@/router/index.js'
+import { useToast } from 'primevue/usetoast';
 
 export function repositoryPost() {
+    // const toast = useToast();
+    const handleRequestError = (error) => {
+        switch (error.response.status) {
+            case 401:
+                router.push({ path: 'auth/signin' });
+                break;
+        
+            case 400:
+                console.log("400");
+                // toast.add({ severity: 'error', summary: 'WTF!!!', detail: 'WTF are you doing?', life: 3000 });
+                break;
+
+            case 404:
+                // toast.add({ severity: 'error', summary: 'WTF!!!', detail: 'WTF are you doing?', life: 3000 });
+                break;
+        
+            case 500:
+                //toast.add({ severity: 'error', summary: 'Server is down', detail: 'server is sleaping', life: 3000 });
+                break;
+        
+            default:
+                //toast.add({ severity: 'error', summary: 'Error', detail: 'I have no idea what just happend :D', life: 3000 });
+                break;
+        }
+
+        return null;
+    };
+
     const getLitePostById = async (id) => {
         let res = await axios.get(`https://localhost:7213/Post/postlite?id=${id}`)
         .catch(error => {
-            console.error('Error occured:', error);
+            handleRequestError(error);
         });
         
         return res.data;
@@ -14,7 +44,7 @@ export function repositoryPost() {
     const getLitePostList = async () => {
         let res = await axios.get(`https://localhost:7213/Post/postlitelist`)
         .catch(error => {
-            console.error('Error occured:', error);
+            handleRequestError(error);
         });
         
         return res.data;
@@ -31,7 +61,7 @@ export function repositoryPost() {
               }
         })
         .catch(error => {
-            console.error('Error occured:', error);
+            handleRequestError(error);
         });
         
         return res.data;
@@ -40,7 +70,7 @@ export function repositoryPost() {
     const getPoolOptionListByPostId = async (id) => {
         let res = await axios.get(`https://localhost:7213/Post/pooloptionlist?id=${id}`)
         .catch(error => {
-            console.error('Error occured:', error);
+            handleRequestError(error);
         });
         
         return res.data;
@@ -59,7 +89,7 @@ export function repositoryPost() {
                   }
             }
         ).catch(error => {
-            console.error('Error occured:', error);
+            handleRequestError(error);
         });
         
         if(res){
@@ -86,8 +116,7 @@ export function repositoryPost() {
     
             return res.data;
         } catch (error) {
-            console.error('Error occurred:', error);
-            return null;
+            handleRequestError(error);
         }
     };
 

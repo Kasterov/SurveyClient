@@ -3,38 +3,40 @@ import { useLayout } from '@/layout/composables/layout';
 import { ref, computed } from 'vue';
 import AppConfig from '@/layout/AppConfig.vue';
 import { repositoryUser } from '@/repository/repositoryUser';
-import { useRouter } from 'vue-router'
+import router from '@/router/index.js'
+import { useToast } from 'primevue/usetoast';
 
-const router = useRouter();
 const { signInUser } = repositoryUser();
 const { layoutConfig } = useLayout();
-
+const loadingSignInButton = ref(false);
 const userName = ref('');
-const email = ref('');
 const password = ref('');
-const dateOfBirthValue = ref(null);
+const toast = useToast();
 
 let invalidUserName = ref('');
-let invalidPassword = ref('');
-let invalidEmail = ref('');
 
 const signInUserWithDTO = async () => {
-
+    loadingSignInButton.value = true;
     let signInUserDTO = {
         Name: userName.value,
         Password: password.value
     }
 
-    let token = await signInUser(signInUserDTO);
-    router.push({ path: '/poolhub' });
+    let isSignedIn = await signInUser(signInUserDTO);
+    loadingSignInButton.value = false;
+
+    if(isSignedIn) {
+        router.push({ path: '/poolhub' });
+    }
+    else {
+        toast.add({ severity: 'error', summary: 'Filed to sign in!', detail: 'Wrong user name or paasword', life: 3000 });
+    }
 } 
 
-const logoUrl = computed(() => {
-    return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
-});
 </script>
 
 <template>
+    <Toast />
     <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
         <div class="flex flex-column align-items-center justify-content-center">
             <!-- <div class="mb-5 w-9rem flex-shrink-0 text-5xl mt-5">Survery</div> -->
@@ -61,7 +63,13 @@ const logoUrl = computed(() => {
                             </div>
                             <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
                         </div> -->
-                        <Button :onClick="signInUserWithDTO" label="Sign in" class="w-full p-3 text-xl"></Button>
+                        <Button :onClick="signInUserWithDTO" :loading="loadingSignInButton" label="Sign in" class="w-full p-3 text-xl"></Button>
+                    </div>
+
+                    <div class="text-center mt-5">
+                        <!-- <img src="/demo/images/login/avatar.png" alt="Image" height="50" class="mb-3" /> -->
+                        <Button :onclick="() => router.push({ path: 'signup' })" label="I do not have an account" class="p-button-info p-button-text mr-2 mb-2" />
+                        <!-- <span class="text-600 font-medium">Sign up to continue</span> -->
                     </div>
                 </div>
             </div>

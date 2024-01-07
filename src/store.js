@@ -1,5 +1,4 @@
 import Vuex from 'vuex';
-
 import { createApp } from 'vue';
 
 const app = createApp({});
@@ -12,13 +11,19 @@ export default new Vuex.Store({
   mutations: {
     setToken(state, token) {
       state.token = token;
-      localStorage.setItem('token', token); // Сохраняем токен в локальное хранилище
+      localStorage.setItem('token', token);
+    },
+    removeToken(state) {
+      state.token = null;
+      localStorage.removeItem('token');
     },
   },
   actions: {
-    // Действие для сохранения токена
     saveToken({ commit }, token) {
       commit('setToken', token);
+    },
+    clearToken({ commit }) {
+      commit('removeToken');
     },
   },
   getters: {

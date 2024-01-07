@@ -36,14 +36,14 @@ export function repositoryUser() {
         ).catch(error => {
             console.error('Error occured:', error);
         });
-        
+
         if(res){
             const token = res.data;
             store.dispatch('saveToken', token);
-            return res.data; 
+            return true; 
+        } else {
+            return false;
         }
-
-        return null;
     };
 
     return {

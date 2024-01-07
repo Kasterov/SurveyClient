@@ -11,11 +11,11 @@ let documentStyle = getComputedStyle(document.documentElement);
 let textColor = documentStyle.getPropertyValue('--text-color');
 
 const checkboxValue = ref([]);
+const radioValue = ref(null);
+const isMultiple = ref(false);
+
 const dataviewValue = ref(null);
 const layout = ref('grid');
-
-const sortOrder = ref(null);
-const sortField = ref(null);
 
 const poolOptionsModal = ref(null);
 
@@ -46,7 +46,7 @@ const vote = async () => {
 
     let createVoteListDTO = {
         userId: 1,
-        voteIdList: checkboxValue.value
+        voteIdList: radioValue.value ? [radioValue.value] : checkboxValue.value
     }
 
     await createVoteList(createVoteListDTO);
@@ -56,8 +56,11 @@ const vote = async () => {
     .filter(x => x.id == poolOptionsModal.value.id)
     .map(x => {
         let indexes = [];
+        let arrayToFilter = [];
 
-        checkboxValue.value.forEach((id) => {
+        arrayToFilter = isMultiple.value ? checkboxValue.value : [radioValue.value];
+
+        arrayToFilter.forEach((id) => {
         let index = poolOptionsModal.value.options.findIndex((element) => element.id === id);
         if (index !== -1) {
             indexes.push(index);
@@ -76,6 +79,7 @@ const vote = async () => {
     })
 
     display.value = false;
+    radioValue.value = null;
     checkboxValue.value = [];
 };
 
@@ -84,22 +88,14 @@ const display = ref(false);
 const poolhubService = new PoolhubService();
 
 const open = async (poolId) => {
-    let poolOptions = await getPoolOptionListByPostId(poolId);
-    poolOptionsModal.value = poolOptions;
+    let _poolOptions = await getPoolOptionListByPostId(poolId);
+    poolOptionsModal.value = _poolOptions;
+
+    isMultiple.value = _poolOptions.isMultiple;
+
     display.value = true;
 };
 
-const close = () => {
-    display.value = false;
-};
-
-const openConfirmation = () => {
-    displayConfirmation.value = true;
-};
-
-const closeConfirmation = () => {
-    displayConfirmation.value = false;
-};
 
 const test = () => {
     console.log("tere");
@@ -141,6 +137,7 @@ onMounted(async () => {
 </script>
 
 <template>
+    <Toast />
     <Dialog :header="poolOptionsModal && poolOptionsModal.title" v-model:visible="display" :breakpoints="{ '960px': '75vw' }" :style="{ width: '30vw' }" :modal="true">
         <div class="grid mt-1">
             <div class="col-12 md:col-12">
@@ -149,14 +146,15 @@ onMounted(async () => {
             <div v-for="(poolOption, id) in poolOptionsModal.options" :key="id" class="col-12 md:col-6">
                 <div class="card">
                     <div class="field-checkbox mb-1">
-                        <Checkbox :id="'checkOption' + id" name="option" :value="poolOption.id" v-model="checkboxValue" />
+                        <RadioButton v-if="!poolOptionsModal.isMultiple" :id="'checkOption' + id" name="option" :value="poolOption.id" v-model="radioValue" />
+                        <Checkbox v-if="poolOptionsModal.isMultiple" :id="'checkOption' + id" name="option" :value="poolOption.id" v-model="checkboxValue" />
                         <label :for="'checkOption' + id">{{poolOption.title}}</label>
                     </div>
                 </div>
             </div>
         </div>
         <template #footer>
-            <Button label="Vote" :loading="loadingVoteButton" @click="vote" icon="pi pi-check" class="p-button-outlined"/>
+            <Button label="Vote" :loading="loadingVoteButton" @click="vote()" icon="pi pi-check" class="p-button-outlined"/>
         </template>
     </Dialog>
     <div class="grid">

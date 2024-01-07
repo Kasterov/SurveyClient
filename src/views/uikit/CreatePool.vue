@@ -6,6 +6,8 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter();
 const { createPost } = repositoryPost();
+const loadingCreatePoolButton = ref(false);
+const mutlipleSelect = ref(false);
 
 const poolName = ref(null);
 const poolDescription = ref(null);
@@ -24,14 +26,19 @@ const addPoolOption = () => {
 
 const createUserDTO = async () => {
 
+    loadingCreatePoolButton.value = true;
+
     let createPostDTO = {
         title: poolName.value,
         description: poolDescription.value,
+        isMultiple: mutlipleSelect.value,
         authorId: 6,
         options: poolOptions.value.filter(option => option.title != '' && option.title != null)
     }
 
     let res = await createPost(createPostDTO);
+
+    loadingCreatePoolButton.value = false;
 
     if(res) {
         router.push({ path: '/poolhub' });
@@ -41,6 +48,7 @@ const createUserDTO = async () => {
 </script>
 
 <template>
+    <Toast />
     <div class="grid">
         <div class="col-12">
             <div class="card">
@@ -53,9 +61,13 @@ const createUserDTO = async () => {
                 </div>
                 <div class="field col-12 md:col-4">
                     <span class="p-float-label">
-                        <Textarea inputId="textarea" rows="3" cols="64" v-model="poolDescription"></Textarea>
+                        <Textarea inputId="textarea" rows="3" cols="25" v-model="poolDescription"></Textarea>
                         <label for="textarea">Description</label>
                     </span>
+                </div>
+                <div class="field col-12 md:col-4">
+                    <label class="block text-xl font-small mb-2">Multiple selection</label>
+                    <InputSwitch v-model="mutlipleSelect" />
                 </div>
                 <div v-for="(poolOption, index) in poolOptions" :key="index" class="field col-12 md:col-6">
                     <span class="p-float-label">
@@ -64,7 +76,7 @@ const createUserDTO = async () => {
                     </span>
                 </div>
                 <div class="field col-12 md:col-6">
-                    <Button label="Create pool" :onClick="createUserDTO" class="p-button-raised p-button-primary mr-2 mb-2"/>
+                    <Button label="Create pool" :loading="loadingCreatePoolButton" :onClick="createUserDTO" class="p-button-raised p-button-primary mr-2 mb-2"/>
                 </div>
             </div>
         </div>
