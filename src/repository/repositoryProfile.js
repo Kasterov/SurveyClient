@@ -1,10 +1,8 @@
 import axios from 'axios';
 import store from '@/store';
 import router from '@/router/index.js'
-import { useToast } from 'primevue/usetoast';
 
-export function repositoryPost() {
-    // const toast = useToast();
+export function repositoryProfile() {
     const handleRequestError = (error) => {
         switch (error.response.status) {
             case 401:
@@ -32,8 +30,8 @@ export function repositoryPost() {
         return null;
     };
 
-    const getLitePostById = async (id) => {
-        let res = await axios.get(`https://localhost:7213/Post/postlite?id=${id}`)
+    const getListJob = async () => {
+        let res = await axios.get(`https://localhost:7213/Job/jobs`)
         .catch(error => {
             handleRequestError(error);
         });
@@ -41,8 +39,8 @@ export function repositoryPost() {
         return res.data;
     };
 
-    const getLitePostList = async () => {
-        let res = await axios.get(`https://localhost:7213/Post/post-lite-list`)
+    const getListEducation = async () => {
+        let res = await axios.get(`https://localhost:7213/Education/educations`)
         .catch(error => {
             handleRequestError(error);
         });
@@ -50,17 +48,8 @@ export function repositoryPost() {
         return res.data;
     };
 
-    const getPostMenu = async (params) => {
-        const token = store.getters.getToken
-        let res = await axios.get(`https://localhost:7213/Post/post-menu`,
-        {
-            params: params,
-            headers: {
-                'Content-Type': 'application/json-patch+json',
-                'accept': '*/*',
-                'Authorization': `Bearer ${token}`
-              }
-        })
+    const getListCountry = async () => {
+        let res = await axios.get(`https://localhost:7213/Country/countries`)
         .catch(error => {
             handleRequestError(error);
         });
@@ -68,8 +57,8 @@ export function repositoryPost() {
         return res.data;
     };
 
-    const getPoolOptionListByPostId = async (id) => {
-        let res = await axios.get(`https://localhost:7213/Post/pool-option-list?id=${id}`)
+    const getListHobby = async () => {
+        let res = await axios.get(`https://localhost:7213/Hobby/hobbies`)
         .catch(error => {
             handleRequestError(error);
         });
@@ -77,11 +66,11 @@ export function repositoryPost() {
         return res.data;
     };
 
-    const createPost = async (createPostDTO) => {
+    const addProfileData = async (profileDTO) => {
         const token = store.getters.getToken
         let res = await axios.post(
-            'https://localhost:7213/Post/post',
-            createPostDTO,
+            'https://localhost:7213/Profile/profile',
+            profileDTO,
             {
                 headers: {
                     'Content-Type': 'application/json-patch+json',
@@ -100,33 +89,34 @@ export function repositoryPost() {
         return null;
     };
 
-    const deletePost = async (id) => {
-        const token = store.getters.getToken;
-    
-        try {
-            const res = await axios.delete(
-                `https://localhost:7213/Post/post?id=${id}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json-patch+json',
-                        'Accept': '*/*',
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-    
-            return res.data;
-        } catch (error) {
+    const getProfileByUserId = async () => {
+        const token = store.getters.getToken
+        let res = await axios.get(
+            'https://localhost:7213/Profile/profile',
+            {
+                headers: {
+                    'Content-Type': 'application/json-patch+json',
+                    'accept': '*/*',
+                    'Authorization': `Bearer ${token}`
+                  }
+            }
+        ).catch(error => {
             handleRequestError(error);
+        });
+        
+        if(res){
+            return res.data; 
         }
+
+        return null;
     };
 
     return {
-            getLitePostById: getLitePostById,
-            getLitePostList: getLitePostList,
-            createPost: createPost,
-            getPoolOptionListByPostId: getPoolOptionListByPostId,
-            getPostMenu: getPostMenu,
-            deletePost: deletePost
-        }
+        getListJob: getListJob,
+        getListEducation: getListEducation,
+        getListCountry: getListCountry,
+        getListHobby: getListHobby,
+        addProfileData: addProfileData,
+        getProfileByUserId: getProfileByUserId
+    }
 };

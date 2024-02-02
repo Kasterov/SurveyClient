@@ -10,6 +10,7 @@ const model = ref([
             { label: 'Pool hub', icon: 'pi pi-fw pi-home', to: '/poolHub' },
             { label: 'Pool menu', icon: 'pi pi-fw pi-home', to: '/poolmenu' },
             { label: 'Create pool', icon: 'pi pi-fw pi-home', to: '/createPool' },
+            { label: 'Profile', icon: 'pi pi-fw pi-home', to: '/profile' },
             { label: 'Sign in', icon: 'pi pi-fw pi-home', to: '/auth/signIn' },
             { label: 'Sign up', icon: 'pi pi-fw pi-home', to: '/auth/signUp' },
         ]

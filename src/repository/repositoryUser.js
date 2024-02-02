@@ -25,7 +25,7 @@ export function repositoryUser() {
 
     const signInUser = async (signInUserDTO) => {
         let res = await axios.post(
-            'https://localhost:7213/User/signin',
+            'https://localhost:7213/User/sign-in',
             signInUserDTO,
             {
                 headers: {

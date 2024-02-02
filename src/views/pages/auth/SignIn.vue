@@ -26,7 +26,7 @@ const signInUserWithDTO = async () => {
     loadingSignInButton.value = false;
 
     if(isSignedIn) {
-        router.push({ path: '/poolhub' });
+        router.go(-1);
     }
     else {
         toast.add({ severity: 'error', summary: 'Filed to sign in!', detail: 'Wrong user name or paasword', life: 3000 });

@@ -1,9 +1,10 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
-import { ref, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import AppConfig from '@/layout/AppConfig.vue';
 import { repositoryUser } from '@/repository/repositoryUser';
 import { useRouter } from 'vue-router'
+import store from '@/store';
 
 const router = useRouter();
 const { registerUser } = repositoryUser();
@@ -53,6 +54,14 @@ const createUserDTO = async () => {
     await registerUser(createUserDTO);
     router.push({ path: 'signIn' });
 } 
+
+onMounted(() => {
+    const token = store.getters.getToken
+    console.log(token);
+    if(token != null) {
+        router.push("/poolhub"); 
+    }
+});
 
 const logoUrl = computed(() => {
     return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;

@@ -5,7 +5,7 @@ export function repositoryVote() {
     const token = store.getters.getToken
     const createVoteList = async (createVoteListDTO) => {
         let res = await axios.post(
-            'https://localhost:7213/Vote/votelist',
+            'https://localhost:7213/Vote/vote-list',
             createVoteListDTO,
             {
                 headers: {
