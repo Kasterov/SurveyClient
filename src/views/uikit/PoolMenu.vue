@@ -5,6 +5,7 @@ import ProductService from '@/service/ProductService';
 import { useToast } from 'primevue/usetoast';
 import { repositoryPost } from '@/repository/repositoryPost';
 import { useRouter } from 'vue-router'
+import { DateTime  } from 'luxon';
 
 const router = useRouter();
 
@@ -46,9 +47,7 @@ onMounted(() => {
 const dt = ref();
 const loading = ref(false);
 const totalRecords = ref(0);
-const customers = ref();
 const selectedCustomers = ref();
-const selectAll = ref(false);
 const first = ref(0);
 const searchText = ref(null);
 const filters = ref({
@@ -147,6 +146,12 @@ const onFilter = (event) => {
                         <template #body="slotProps">
                             <span class="p-column-title">People</span>
                             {{ slotProps.data.people }}
+                        </template>
+                    </Column>
+                    <Column field="created" header="Created" :sortable="false" headerStyle="width:20%; min-width:10rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Created</span>
+                            {{ DateTime.fromJSDate(new Date(slotProps.data.created)).toFormat('dd LLLL yyyy') }}
                         </template>
                     </Column>
                     <Column field="options" headerStyle="min-width:10rem;">

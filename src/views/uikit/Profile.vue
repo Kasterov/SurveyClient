@@ -27,6 +27,7 @@ const relationships = ref([
     {status: "Divorced", value: 7}
 ]);
 const relationship = ref(null);
+const submitted = ref(false);
 
 const sallaryGrades = ref([
     {status: "Up to 400 $", value: 1},
@@ -42,6 +43,8 @@ const countries = ref([]);
 const bio = ref(null);
 const name = ref(null);
 const email = ref(null);
+const avatar = ref(null);
+const idOfAvatar = ref(null);
 
 const hobbies = ref([]);
 const hobbyList = ref([]);
@@ -154,40 +157,62 @@ const unselectHobby = (id) => {
  
 const uploadProfileDTO = async() => {
 
-    loadingUpdateProfile.value = true;
+    submitted.value = true;
 
-    let profileDTO = {
-        name: name.value,
-        email: email.value,
-        DateOfBirth: dateOfBirth.value,
-        gender: gender.value?.value,
-        bio: bio.value,
-        relationship: relationship.value?.value,
-        sallary: sallaryGrade.value?.value,
-        countryId: country.value?.id,
-        jobs: jobs.value.map(j => ({jobId: j.id})),
-        hobbies: hobbies.value.map(h => ({hobbyId: h.id})),
-        educations: educations.value.map(e => ({educationId: e.id}))
-    };
+    if(name.value && email.value && country.value){
+        loadingUpdateProfile.value = true;
+        let avatarToUpload = null;
 
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Profile updated!', life: 4000 });
+        if(avatar.value != null){
+            avatarToUpload = avatar.value
+        }
 
-    let res = await addProfileData(profileDTO);
-    loadingUpdateProfile.value = false;
+        let profileDTO = {
+            name: name.value,
+            email: email.value,
+            DateOfBirth: dateOfBirth.value,
+            gender: gender.value?.value,
+            bio: bio.value,
+            relationship: relationship.value?.value,
+            sallary: sallaryGrade.value?.value,
+            avatar: avatarToUpload,
+            countryId: country.value?.id,
+            jobs: jobs.value.map(j => ({jobId: j.id})),
+            hobbies: hobbies.value.map(h => ({hobbyId: h.id})),
+            educations: educations.value.map(e => ({educationId: e.id}))
+        };
+
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Profile updated!', life: 4000 });
+
+        let res = await addProfileData(profileDTO);
+        loadingUpdateProfile.value = false;
+    }
 }
 
 const uploadedImage = ref(null);
 
 const customBase64Uploader = async (event) => {
-  const file = event.files[0];
-  const reader = new FileReader();
-  let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
+    const file = event.files[0];
+    const reader = new FileReader();
+    let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
 
-  reader.readAsDataURL(blob);
+    reader.readAsDataURL(blob);
 
-  reader.onloadend = function () {
-    uploadedImage.value = reader.result;
-  };
+    console.log(avatar.value);
+
+    avatar.value = {
+        id: idOfAvatar.value,
+        name: file.name,
+        base64: "",
+        contentType: file.type,
+        expression: file.name.split('.').pop()
+    } 
+
+    reader.onloadend = function () {
+        let base64Full = reader.result;
+        avatar.value.base64 = base64Full.split(',')[1];
+        uploadedImage.value = base64Full;
+    };
 };
 
 const handleDropdownChange = () => {
@@ -214,7 +239,6 @@ onMounted(async () => {
 
     var profileExistData = await getProfileByUserId();
 
-
     name.value = profileExistData.name;
     email.value = profileExistData.email;
     dateOfBirth.value = new Date(profileExistData.dateOfBirth);
@@ -222,7 +246,9 @@ onMounted(async () => {
     sallaryGrade.value = sallaryGrades.value.filter(s => s.value == profileExistData.sallary)[0];
     relationship.value = relationships.value.filter(s => s.value == profileExistData.relationship)[0];
     gender.value = genders.value.filter(s => s.value == profileExistData.gender)[0];
-    country.value = countries.value.filter(s => s.id == profileExistData.country.id)[0];
+    country.value = countries.value.filter(s => s.id == profileExistData.country?.id)[0];
+    uploadedImage.value = profileExistData.fileEntityLink;
+    idOfAvatar.value = profileExistData.fileEntityId;
 
     addEducationList(profileExistData.educations);
     addJobList(profileExistData.jobs);
@@ -281,8 +307,8 @@ onMounted(async () => {
                 <div class="grid p-fluid mt-3">
                     <div class="field col-12 md:col-4">
                         <span class="p-float-label flex align-items-center justify-content-between">
-                            <InputText id="username" type="text" v-model="name" />
-                            <label for="username">Name</label>
+                            <InputText id="username" type="text" v-model="name" :class="{ 'p-invalid': submitted && !name }" :required="true" />
+                            <label for="username">Name <span v-if="submitted && !name"> is required</span></label>
                         </span>
                     </div>
                     <div class="field col-12 md:col-2">
@@ -293,22 +319,22 @@ onMounted(async () => {
                     </div>
                     <div class="field col-12 md:col-3">
                         <span class="p-float-label">
-                            <Dropdown id="dropdown" :options="countries" v-model="country" optionLabel="name"></Dropdown>
-                            <label for="dropdown">Country</label>
+                            <Dropdown id="dropdown" :options="countries" v-model="country" optionLabel="name" :class="{ 'p-invalid': submitted && !country }" :required="true"></Dropdown>
+                            <label for="dropdown">Country <span v-if="submitted && !country"> is required</span> </label>
                         </span>
                     </div>
                     <div class="field col-12 md:col-3">
                         <span class="p-float-label">
-                            <Calendar inputId="calendar" v-model="dateOfBirth"></Calendar>
-                            <label for="calendar">Date of birth</label>
+                            <Calendar inputId="calendar" v-model="dateOfBirth" :class="{ 'p-invalid': submitted && !dateOfBirth }" :required="true"></Calendar>
+                            <label for="calendar">Date of birth <span v-if="submitted && !dateOfBirth"> is required</span> </label>
                         </span>
                     </div>
                 </div>
                 <div class="grid p-fluid mt-3">
                     <div class="field col-12 md:col-4">
                         <span class="p-float-label flex align-items-center justify-content-between">
-                            <InputText id="email" type="text" v-model="email" />
-                            <label for="username">Email</label>
+                            <InputText id="email" type="text" v-model="email" :class="{ 'p-invalid': submitted && !email }" :required="true" />
+                            <label for="username">Email <span v-if="submitted && !email"> is required</span></label>
                         </span>
                     </div>
                     <div class="field col-12 md:col-4">

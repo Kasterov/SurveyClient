@@ -15,44 +15,25 @@ const email = ref('');
 const password = ref('');
 const dateOfBirthValue = ref(null);
 
-let invalidUserName = ref('');
-let invalidPassword = ref('');
-let invalidEmail = ref('');
+const submitted = ref(false);
 
 const createUserDTO = async () => {
 
-    let createUserDTO = {
-        Name: userName.value,
-        Password: password.value,
-        Email: email.value,
-        Gender: 0,
-        DateOfBirth: dateOfBirthValue.value
-    }
+    submitted.value = true;
 
-    if(createUserDTO.Name == ''){
-        invalidUserName.value = 'p-invalid';
-    } else {
-        invalidUserName.value = '';
-    }
+    if(userName.value && email.value && password.value && dateOfBirthValue.value){
 
-    if(createUserDTO.Password == ''){
-        invalidPassword.value = 'p-invalid';
-    } else {
-        invalidPassword.value = '';
-    }
+        let createUserDTO = {
+            Name: userName.value,
+            Password: password.value,
+            Email: email.value,
+            Gender: 0,
+            DateOfBirth: dateOfBirthValue.value
+        }
 
-    if(createUserDTO.Email == ''){
-        invalidEmail.value = 'p-invalid';
-    } else {
-        invalidEmail.value = '';
+        await registerUser(createUserDTO);
+        router.push({ path: 'signIn' });
     }
-
-    if(createUserDTO.Email == '' || createUserDTO.Password == '' || createUserDTO.Name == ''){
-        return;
-    }
-
-    await registerUser(createUserDTO);
-    router.push({ path: 'signIn' });
 } 
 
 onMounted(() => {
@@ -63,9 +44,9 @@ onMounted(() => {
     }
 });
 
-const logoUrl = computed(() => {
-    return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
-});
+// const logoUrl = computed(() => {
+//     return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
+// });
 </script>
 
 <template>
@@ -80,33 +61,23 @@ const logoUrl = computed(() => {
                         <div class="text-900 text-3xl font-medium mb-3">Sign up survey!</div>
                         <!-- <span class="text-600 font-medium">Sign up to continue</span> -->
                     </div>
-
                     <div>
                         <label for="userName1" class="block text-900 text-xl font-medium mb-2">User name</label>
-                        <InputText id="userName1" type="text" placeholder="User name" :onClick="() => {invalidUserName = ''}" :class="invalidUserName" class="w-full md:w-30rem mb-5" style="padding: 1rem" v-model="userName" />
+                        <InputText id="userName1" type="text" placeholder="User name" class="w-full md:w-30rem mb-5" style="padding: 1rem" v-model="userName" required="true" :class="{ 'p-invalid': submitted && !userName }"/>
 
                         <label for="email1" class="block text-900 text-xl font-medium mb-2">Email</label>
-                        <InputText id="email1" type="text" placeholder="Email address" :onClick="() => {invalidEmail = ''}" :class="invalidEmail" class="w-full md:w-30rem mb-5" style="padding: 1rem" v-model="email" />
+                        <InputText id="email1" type="text" placeholder="Email address" class="w-full md:w-30rem mb-5" style="padding: 1rem" v-model="email" required="true" :class="{ 'p-invalid': submitted && !email }"/>
 
                         <label for="password1" class="block text-900 font-medium text-xl mb-2">Password</label>
-                        <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" :onClick="() => {invalidPassword = ''}" :class="invalidPassword" class="w-full mb-5" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
+                        <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" class="w-full mb-5" inputClass="w-full" :inputStyle="{ padding: '1rem' }" required="true" :class="{ 'p-invalid': submitted && !password }">
+                        </Password>
 
-                        <label for="dateOfBirth" class="block text-900 font-medium text-xl mb-2">Date of birth</label>
-                        <Calendar class="w-full mb-5" :showIcon="true" :showButtonBar="true" v-model="dateOfBirthValue"></Calendar>
-
-                        <!-- <div class="flex align-items-center justify-content-between mb-5 gap-5">
-                            <div class="flex align-items-center">
-                                <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
-                                <label for="rememberme1">Remember me</label>
-                            </div>
-                            <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
-                        </div> -->
-                        <Button :onClick="createUserDTO" label="Sign Up" class="w-full p-3 text-xl"></Button>
+                        <label for="dateOfBirth" class="p-invalid block text-900 font-medium text-xl mb-2">Date of birth</label>
+                        <Calendar class="w-full" :showIcon="true" :showButtonBar="true" v-model="dateOfBirthValue" required="true" :class="{ 'p-invalid': submitted && !dateOfBirthValue }"></Calendar> 
+                        <Button :onClick="createUserDTO" label="Sign Up" class="w-full p-3 text-xl mt-5"></Button>
                         <div class="text-center mt-5">
-                        <!-- <img src="/demo/images/login/avatar.png" alt="Image" height="50" class="mb-3" /> -->
-                        <Button :onclick="() => router.push({ path: 'signin' })" label="I have an account" class="p-button-info p-button-text mr-2 mb-2" />
-                        <!-- <span class="text-600 font-medium">Sign up to continue</span> -->
-                    </div>
+                            <Button :onclick="() => router.push({ path: 'signin' })" label="I have an account" class="p-button-info p-button-text mr-2 mb-2" />
+                        </div>
                     </div>
                 </div>
             </div>

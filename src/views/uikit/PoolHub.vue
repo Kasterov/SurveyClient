@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import PoolhubService from '@/service/PoolhubService';
 import { repositoryPost } from '@/repository/repositoryPost';
 import { repositoryVote } from '@/repository/repositoryVote';
+import { DateTime  } from 'luxon';
 
 const { getPoolOptionListByPostId } = repositoryPost();
 const { createVoteList } = repositoryVote();
@@ -176,10 +177,10 @@ onMounted(async () => {
                                 <div>
                                     <div class="flex align-items-center justify-content-between">
                                         <div class="flex align-items-center">
-                                            <Avatar :image="'demo/images/avatar/amyelsner.png'" class="mr" size="large" shape="circle"></Avatar>
+                                            <Avatar :image="slotProps.data.author.avatarLink" class="mr" size="large" shape="circle"></Avatar>
                                             <span class="text-l ml-2">{{ slotProps.data.author.name }}</span>        
                                         </div>
-                                        <span class="text-l ml-2">{{ new Date(slotProps.data.created).getDate()}}.{{(new Date(slotProps.data.created).getMonth() + 1).toString().padStart(2, '0')}}.{{new Date(slotProps.data.created).getFullYear()}}</span>
+                                        <span class="text-l ml-2">{{ DateTime.fromJSDate(new Date(slotProps.data.created)).setLocale("en").toRelative()}}</span>
                                     </div>
                                     <div class="flex align-items-center justify-content-between mt-1" v-if="true">
                                         <Button class="p-button-rounded p-button-info p-button-text" label="more" icon="pi pi-ellipsis-h" @click.stop="stopPropagation" />
