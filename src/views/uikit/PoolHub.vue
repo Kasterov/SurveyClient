@@ -4,6 +4,7 @@ import PoolhubService from '@/service/PoolhubService';
 import { repositoryPost } from '@/repository/repositoryPost';
 import { repositoryVote } from '@/repository/repositoryVote';
 import { DateTime  } from 'luxon';
+import ProgressSpinner from 'primevue/progressspinner';
 
 const { getPoolOptionListByPostId } = repositoryPost();
 const { createVoteList } = repositoryVote();
@@ -17,6 +18,52 @@ const isMultiple = ref(false);
 
 const dataviewValue = ref(null);
 const layout = ref('grid');
+const scrolled = ref(true);
+
+const postCount = ref(1);
+
+const customLazyParams = ref({pageSize: 6, page: 1});
+
+const handleScroll = async (event) => {
+    const scrollableElement = event.target;
+    const scrollPercentage = (scrollableElement.scrollTop / (scrollableElement.scrollHeight - scrollableElement.clientHeight)) * 100;
+
+    if (scrollPercentage >= 80 && dataviewValue.value.length < postCount.value) {
+        scrolled.value == false
+
+        customLazyParams.value.page++;
+
+        customLazyParams.value.page = customLazyParams.value.page;
+
+        let res = await poolhubService.getPoolHubList(customLazyParams.value);
+        postCount.value = res.totalCount;
+
+        let formatedPoolList = [];
+
+        res.responseList.map(pool => {
+            let tempData = {
+                id: pool.id,
+                author: pool.author,
+                title: pool.title,
+                created: pool.created,
+                totalCount: pool.totalCount,
+                labels: pool.votes.map(x => truncateString(x.option, 40)),
+                datasets: [
+                    {
+                        data: pool.votes.map(x => x.count),
+                        backgroundColor: [documentStyle.getPropertyValue('--indigo-800'), documentStyle.getPropertyValue('--teal-600'), documentStyle.getPropertyValue('--primary-600'),  documentStyle.getPropertyValue('--purple-800')],
+                        hoverBackgroundColor: [documentStyle.getPropertyValue('--indigo-700'), documentStyle.getPropertyValue('--teal-500'), documentStyle.getPropertyValue('--primary-500'),  documentStyle.getPropertyValue('--purple-700')]
+                    }
+                ],
+            }; 
+        
+            formatedPoolList.push(tempData); 
+
+        });
+
+        dataviewValue.value = dataviewValue.value.concat(formatedPoolList);
+    } 
+}
 
 const poolOptionsModal = ref(null);
 
@@ -107,11 +154,12 @@ const stopPropagation = (event) => {
 };
 
 onMounted(async () => {
-    let res = await poolhubService.getPoolHubList();
+    let res = await poolhubService.getPoolHubList(customLazyParams.value);
+    postCount.value = res.totalCount;
 
     let formatedPoolList = [];
 
-    res.map(pool => {
+    res.responseList.map(pool => {
         let tempData = {
             id: pool.id,
             author: pool.author,
@@ -161,8 +209,8 @@ onMounted(async () => {
     <div class="grid">
         <div class="col-12">
             <div class="card">
-                <h5>Pool hub</h5>
-                <DataView :value="dataviewValue" :layout="layout" :paginator="true" :rows="9" :sortOrder="sortOrder" :sortField="sortField">
+                <!-- <h5>Pool hub</h5> -->
+                <DataView :value="dataviewValue" :layout="layout" :paginator="false" :rows="9" style="max-height: 40rem; overflow-y: auto;" @scroll="handleScroll">
                     <template #grid="slotProps">
                         <div class="col-12 md:col-4">
                             <div class="card m-2 border-1 surface-border pl-3 pt-3 pr-3 pb-0" :onClick="test" style="cursor: pointer;">
@@ -193,7 +241,15 @@ onMounted(async () => {
                         </div>
                     </template>
                 </DataView>
+                <!-- <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="var(--surface-ground)"
+    animationDuration=".5s" aria-label="Custom ProgressSpinner" /> -->
             </div>
         </div>
     </div>
 </template>
+
+<!-- <style>
+  body {
+    overflow: hidden;
+  }
+</style> -->

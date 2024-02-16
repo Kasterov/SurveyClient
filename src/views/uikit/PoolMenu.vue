@@ -105,7 +105,7 @@ const onFilter = (event) => {
                 <DataTable 
                     :value="postMenuContent.responseList" lazy paginator 
                     :first="first" 
-                    :rows="5"
+                    :rows="10"
                     ref="dt" dataKey="id"
                     :totalRecords="totalRecords" 
                     :loading="loading" 

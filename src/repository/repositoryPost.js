@@ -41,8 +41,15 @@ export function repositoryPost() {
         return res.data;
     };
 
-    const getLitePostList = async () => {
-        let res = await axios.get(`https://localhost:7213/Post/post-lite-list`)
+    const getLitePostList = async (paginationReqeust) => {
+        let res = await axios.get(`https://localhost:7213/Post/post-lite-list`,
+        {
+            params: paginationReqeust,
+            headers: {
+                'Content-Type': 'application/json-patch+json',
+                'accept': '*/*',
+              }
+        })
         .catch(error => {
             handleRequestError(error);
         });
