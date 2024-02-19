@@ -5,6 +5,8 @@ import { repositoryPost } from '@/repository/repositoryPost';
 import { repositoryVote } from '@/repository/repositoryVote';
 import { DateTime  } from 'luxon';
 import ProgressSpinner from 'primevue/progressspinner';
+import { watch } from 'vue';
+import axios from 'axios';
 
 const { getPoolOptionListByPostId } = repositoryPost();
 const { createVoteList } = repositoryVote();
@@ -89,11 +91,11 @@ const truncateString = (inputString, maxLength) => {
     }
 }
 
-const vote = async () => {
+const vote = async (postId) => {
     loadingVoteButton.value = true;
 
     let createVoteListDTO = {
-        userId: 1,
+        postId: postId,
         voteIdList: radioValue.value ? [radioValue.value] : checkboxValue.value
     }
 
@@ -132,6 +134,8 @@ const vote = async () => {
 };
 
 const display = ref(false);
+const isPostRevotable = ref(false);
+const isPostVoted = ref(false);
 
 const poolhubService = new PoolhubService();
 
@@ -140,6 +144,24 @@ const open = async (poolId) => {
     poolOptionsModal.value = _poolOptions;
 
     isMultiple.value = _poolOptions.isMultiple;
+
+    let selectedOptions = _poolOptions.options.filter(o => o.isSelected).map(o => o.id);
+    isPostRevotable.value = _poolOptions.isRevotable;
+
+    if(selectedOptions.length == 0){
+        display.value = true;
+        isPostVoted.value = false;
+        return;
+    }
+
+    isPostVoted.value = true;
+
+    if(isMultiple.value){
+        checkboxValue.value = selectedOptions;
+    }
+    else {
+        radioValue.value = selectedOptions[0];
+    }
 
     display.value = true;
 };
@@ -153,7 +175,16 @@ const stopPropagation = (event) => {
       event.stopPropagation(); 
 };
 
+watch(display => {
+    if(display.value){
+        dataviewValue.value = [];
+        radioValue.value = [];
+    }
+});
+
 onMounted(async () => {
+    checkApiKey()
+    // tryGPT();
     let res = await poolhubService.getPoolHubList(customLazyParams.value);
     postCount.value = res.totalCount;
 
@@ -203,7 +234,8 @@ onMounted(async () => {
             </div>
         </div>
         <template #footer>
-            <Button label="Vote" :loading="loadingVoteButton" @click="vote()" icon="pi pi-check" class="p-button-outlined"/>
+            <Tag v-if="isPostVoted && !isPostRevotable" class="mr-2 mb-2" con="pi pi-exclamation-triangle" severity="primary" value="You have already voted"></Tag>
+            <Button v-if="!isPostVoted || isPostRevotable" label="Vote" :loading="loadingVoteButton" @click="vote(poolOptionsModal.id)" icon="pi pi-check" class="p-button-outlined"/>
         </template>
     </Dialog>
     <div class="grid">

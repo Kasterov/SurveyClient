@@ -7,7 +7,10 @@ import { useRouter } from 'vue-router'
 const router = useRouter();
 const { createPost } = repositoryPost();
 const loadingCreatePoolButton = ref(false);
+
 const mutlipleSelect = ref(false);
+const possibleReVote = ref(false);
+const privatePost = ref(false);
 
 const poolName = ref(null);
 const poolDescription = ref(null);
@@ -32,7 +35,8 @@ const createUserDTO = async () => {
         title: poolName.value,
         description: poolDescription.value,
         isMultiple: mutlipleSelect.value,
-        authorId: 6,
+        isRevotable: possibleReVote.value,
+        IsPrivate: privatePost.value,
         options: poolOptions.value.filter(option => option.title != '' && option.title != null)
     }
 
@@ -65,10 +69,18 @@ const createUserDTO = async () => {
                         <label for="textarea">Description</label>
                     </span>
                 </div>
-                <div class="field col-12 md:col-4">
+                <div class="field col-6 md:col-">
+                    <label class="block text-xl font-small mb-2">Private (access only by link)</label>
+                    <InputSwitch v-model="privatePost" />
+                </div> 
+                <div class="field col-6 md:col-">
                     <label class="block text-xl font-small mb-2">Multiple selection</label>
                     <InputSwitch v-model="mutlipleSelect" />
                 </div>
+                <div class="field col-6 md:col-">
+                    <label class="block text-xl font-small mb-2">Possible to re-vote</label>
+                    <InputSwitch v-model="possibleReVote" />
+                </div> 
                 <div v-for="(poolOption, index) in poolOptions" :key="index" class="field col-12 md:col-6">
                     <span class="p-float-label">
                         <InputText type="text" :on:input="addPoolOption" :id="'inputtext' + index" v-model="poolOptions[index].title" class="col-12 md:col-12"/>

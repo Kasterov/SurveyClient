@@ -76,7 +76,17 @@ export function repositoryPost() {
     };
 
     const getPoolOptionListByPostId = async (id) => {
-        let res = await axios.get(`https://localhost:7213/Post/pool-option-list?id=${id}`)
+        const token = store.getters.getToken
+        let auth = token != null ? `Bearer ${token}` : '';
+
+        let res = await axios.get(`https://localhost:7213/Post/pool-option-list?id=${id}`,
+        {
+            headers: {
+                'Content-Type': 'application/json-patch+json',
+                'accept': '*/*',
+                'Authorization': auth
+              }
+        })
         .catch(error => {
             handleRequestError(error);
         });
