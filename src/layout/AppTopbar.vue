@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
 import store from '@/store';
+import eventBus from '../event-bus';
 
 const { layoutConfig, onMenuToggle } = useLayout();
 
@@ -60,6 +61,13 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+
+const searchButton = () => {
+    eventBus.emit("SearchPostsQueryEvent", searchPostInput.value  );
+}
+
+const searchPostInput = ref('');
+
 </script>
 
 <template>
@@ -73,22 +81,17 @@ const isOutsideClicked = (event) => {
             <i class="pi pi-bars"></i>
         </button>
 
-        <button class="p-link layout-topbar-menu-button layout-topbar-button" @click="onTopBarMenuButton()">
-            <i class="pi pi-ellipsis-v"></i>
-        </button>
+        <span class="p-input-icon-left mb-2">
+            <i class="pi pi-search" />
+            <InputText placeholder="Search" style="width: 100%" v-model="searchPostInput"/>
+        </span>
+
+        <button class="p-link layout-menu-button layout-topbar-button" @click="searchButton">Search</button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-calendar"></i>
-                <span>Calendar</span>
-            </button>
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
-            </button>
-            <button @click="onSettingsClick()" class="p-link layout-topbar-button">
-                <i class="pi pi-cog"></i>
-                <span>Settings</span>
             </button>
         </div>
     </div>

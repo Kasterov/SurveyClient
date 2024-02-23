@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 import PoolhubService from '@/service/PoolhubService';
 import { repositoryPost } from '@/repository/repositoryPost';
 import { repositoryVote } from '@/repository/repositoryVote';
@@ -7,6 +7,7 @@ import { DateTime  } from 'luxon';
 import ProgressSpinner from 'primevue/progressspinner';
 import { watch } from 'vue';
 import axios from 'axios';
+import eventBus from '@/event-bus.js'
 
 const { getPoolOptionListByPostId } = repositoryPost();
 const { createVoteList } = repositoryVote();
@@ -183,8 +184,42 @@ watch(display => {
 });
 
 onMounted(async () => {
-    checkApiKey()
-    // tryGPT();
+    let res = await poolhubService.getPoolHubList(customLazyParams.value);
+    postCount.value = res.totalCount;
+
+    let formatedPoolList = [];
+
+    res.responseList.map(pool => {
+        let tempData = {
+            id: pool.id,
+            author: pool.author,
+            title: pool.title,
+            created: pool.created,
+            totalCount: pool.totalCount,
+            labels: pool.votes.map(x => truncateString(x.option, 40)),
+            datasets: [
+                {
+                    data: pool.votes.map(x => x.count),
+                    backgroundColor: [documentStyle.getPropertyValue('--indigo-800'), documentStyle.getPropertyValue('--teal-600'), documentStyle.getPropertyValue('--primary-600'),  documentStyle.getPropertyValue('--purple-800')],
+                    hoverBackgroundColor: [documentStyle.getPropertyValue('--indigo-700'), documentStyle.getPropertyValue('--teal-500'), documentStyle.getPropertyValue('--primary-500'),  documentStyle.getPropertyValue('--purple-700')]
+                }
+            ],
+        }; 
+        
+        formatedPoolList.push(tempData); 
+
+    });
+
+    dataviewValue.value = formatedPoolList;
+});
+
+const postSearchQuery = ref('');
+
+eventBus.on("SearchPostsQueryEvent", async (data) => {
+    postSearchQuery.value = data;
+
+    customLazyParams.value.searchQuery = postSearchQuery.value;
+
     let res = await poolhubService.getPoolHubList(customLazyParams.value);
     postCount.value = res.totalCount;
 
