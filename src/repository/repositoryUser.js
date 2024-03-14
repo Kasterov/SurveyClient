@@ -1,10 +1,11 @@
 import axios from 'axios';
 import store from '@/store';
+import apiUrl from '@/config.js';
 
 export function repositoryUser() {
     const registerUser = async (createUserDTO) => {
         let res = await axios.post(
-            'https://localhost:7213/User/user',
+            `${apiUrl}User/user`,
             createUserDTO,
             {
                 headers: {
@@ -25,7 +26,7 @@ export function repositoryUser() {
 
     const signInUser = async (signInUserDTO) => {
         let res = await axios.post(
-            'https://localhost:7213/User/sign-in',
+            `${apiUrl}User/sign-in`,
             signInUserDTO,
             {
                 headers: {
@@ -46,7 +47,17 @@ export function repositoryUser() {
         }
     };
 
+    const getProfileViewData = async (userId) => {
+        let res = await axios.get(`${apiUrl}User/profile-view?id=${userId}`)
+        .catch(error => {
+            handleRequestError(error);
+        });
+        
+        return res.data;
+    };
+
     return {
+        getProfileViewData: getProfileViewData,
         registerUser: registerUser,
         signInUser: signInUser
     }

@@ -1,11 +1,12 @@
 import axios from 'axios';
 import store from '@/store';
+import apiUrl from '@/config.js';
 
 export function repositoryVote() {
     const token = store.getters.getToken
     const createVoteList = async (createVoteListDTO) => {
         let res = await axios.post(
-            'https://localhost:7213/Vote/vote-list',
+            `${apiUrl}Vote/vote-list`,
             createVoteListDTO,
             {
                 headers: {

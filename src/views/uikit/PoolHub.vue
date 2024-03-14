@@ -1,14 +1,15 @@
 <script setup>
-import { ref, onMounted, inject } from 'vue';
+import { ref, onMounted } from 'vue';
 import PoolhubService from '@/service/PoolhubService';
 import { repositoryPost } from '@/repository/repositoryPost';
 import { repositoryVote } from '@/repository/repositoryVote';
 import { DateTime  } from 'luxon';
 import ProgressSpinner from 'primevue/progressspinner';
 import { watch } from 'vue';
-import axios from 'axios';
 import eventBus from '@/event-bus.js'
+import { useRouter } from 'vue-router'
 
+const router = useRouter();
 const { getPoolOptionListByPostId } = repositoryPost();
 const { createVoteList } = repositoryVote();
 
@@ -38,33 +39,10 @@ const handleScroll = async (event) => {
 
         customLazyParams.value.page = customLazyParams.value.page;
 
-        let res = await poolhubService.getPoolHubList(customLazyParams.value);
-        postCount.value = res.totalCount;
+        let mappedPagnationResponseDTO = await poolhubService.getPoolHubList(customLazyParams.value);
+        postCount.value = mappedPagnationResponseDTO.totalCount;
 
-        let formatedPoolList = [];
-
-        res.responseList.map(pool => {
-            let tempData = {
-                id: pool.id,
-                author: pool.author,
-                title: pool.title,
-                created: pool.created,
-                totalCount: pool.totalCount,
-                labels: pool.votes.map(x => truncateString(x.option, 40)),
-                datasets: [
-                    {
-                        data: pool.votes.map(x => x.count),
-                        backgroundColor: [documentStyle.getPropertyValue('--indigo-800'), documentStyle.getPropertyValue('--teal-600'), documentStyle.getPropertyValue('--primary-600'),  documentStyle.getPropertyValue('--purple-800')],
-                        hoverBackgroundColor: [documentStyle.getPropertyValue('--indigo-700'), documentStyle.getPropertyValue('--teal-500'), documentStyle.getPropertyValue('--primary-500'),  documentStyle.getPropertyValue('--purple-700')]
-                    }
-                ],
-            }; 
-        
-            formatedPoolList.push(tempData); 
-
-        });
-
-        dataviewValue.value = dataviewValue.value.concat(formatedPoolList);
+        dataviewValue.value = dataviewValue.value.concat(mappedPagnationResponseDTO.responseList);
     } 
 }
 
@@ -83,14 +61,6 @@ const pieOptions = ref({
     });
 
 const loadingVoteButton = ref(false);
-
-const truncateString = (inputString, maxLength) => {
-    if (inputString.length > maxLength) {
-        return inputString.substring(0, maxLength - 3) + '...';
-    } else {
-    return inputString;
-    }
-}
 
 const vote = async (postId) => {
     loadingVoteButton.value = true;
@@ -168,85 +138,44 @@ const open = async (poolId) => {
 };
 
 
-const test = () => {
-    console.log("tere");
+const routeToPost = (id) => {
+    router.push({ path: `/pool/${id}` });
+};
+
+const routeToProfile = (id) => {
+    router.push({ path: `/profile-view/${id}` });
 };
 
 const stopPropagation = (event) => {
       event.stopPropagation(); 
 };
 
-watch(display => {
-    if(display.value){
-        dataviewValue.value = [];
-        radioValue.value = [];
-    }
-});
+// watch(display => {
+//     if(display.value){
+//         dataviewValue.value = [];
+//         radioValue.value = [];
+//     }
+// });
 
 onMounted(async () => {
-    let res = await poolhubService.getPoolHubList(customLazyParams.value);
-    postCount.value = res.totalCount;
+    let mappedPagnationResponseDTO = await poolhubService.getPoolHubList(customLazyParams.value);
+    postCount.value = mappedPagnationResponseDTO.totalCount;
 
-    let formatedPoolList = [];
-
-    res.responseList.map(pool => {
-        let tempData = {
-            id: pool.id,
-            author: pool.author,
-            title: pool.title,
-            created: pool.created,
-            totalCount: pool.totalCount,
-            labels: pool.votes.map(x => truncateString(x.option, 40)),
-            datasets: [
-                {
-                    data: pool.votes.map(x => x.count),
-                    backgroundColor: [documentStyle.getPropertyValue('--indigo-800'), documentStyle.getPropertyValue('--teal-600'), documentStyle.getPropertyValue('--primary-600'),  documentStyle.getPropertyValue('--purple-800')],
-                    hoverBackgroundColor: [documentStyle.getPropertyValue('--indigo-700'), documentStyle.getPropertyValue('--teal-500'), documentStyle.getPropertyValue('--primary-500'),  documentStyle.getPropertyValue('--purple-700')]
-                }
-            ],
-        }; 
-        
-        formatedPoolList.push(tempData); 
-
-    });
-
-    dataviewValue.value = formatedPoolList;
+    dataviewValue.value = mappedPagnationResponseDTO.responseList;
 });
 
 const postSearchQuery = ref('');
 
 eventBus.on("SearchPostsQueryEvent", async (data) => {
     postSearchQuery.value = data;
-
     customLazyParams.value.searchQuery = postSearchQuery.value;
+    customLazyParams.value.pageSize = 6;
+    customLazyParams.value.page = 1;
 
-    let res = await poolhubService.getPoolHubList(customLazyParams.value);
-    postCount.value = res.totalCount;
+    let mappedPagnationResponseDTO = await poolhubService.getPoolHubList(customLazyParams.value);
+    postCount.value = mappedPagnationResponseDTO.totalCount;
 
-    let formatedPoolList = [];
-
-    res.responseList.map(pool => {
-        let tempData = {
-            id: pool.id,
-            author: pool.author,
-            title: pool.title,
-            created: pool.created,
-            totalCount: pool.totalCount,
-            labels: pool.votes.map(x => truncateString(x.option, 40)),
-            datasets: [
-                {
-                    data: pool.votes.map(x => x.count),
-                    backgroundColor: [documentStyle.getPropertyValue('--indigo-800'), documentStyle.getPropertyValue('--teal-600'), documentStyle.getPropertyValue('--primary-600'),  documentStyle.getPropertyValue('--purple-800')],
-                    hoverBackgroundColor: [documentStyle.getPropertyValue('--indigo-700'), documentStyle.getPropertyValue('--teal-500'), documentStyle.getPropertyValue('--primary-500'),  documentStyle.getPropertyValue('--purple-700')]
-                }
-            ],
-        }; 
-        
-        formatedPoolList.push(tempData); 
-
-    });
-
-    dataviewValue.value = formatedPoolList;
+    dataviewValue.value = mappedPagnationResponseDTO.responseList;
 });
 
 </script>
@@ -280,10 +209,11 @@ eventBus.on("SearchPostsQueryEvent", async (data) => {
                 <DataView :value="dataviewValue" :layout="layout" :paginator="false" :rows="9" style="max-height: 40rem; overflow-y: auto;" @scroll="handleScroll">
                     <template #grid="slotProps">
                         <div class="col-12 md:col-4">
-                            <div class="card m-2 border-1 surface-border pl-3 pt-3 pr-3 pb-0" :onClick="test" style="cursor: pointer;">
+                            <div class="card m-2 border-1 surface-border pl-3 pt-3 pr-3 pb-0" @click="routeToPost(slotProps.data.id)" style="cursor: pointer;">
                                 <div class="text-center">
                                     <div class="text-xl font-semibold mb-3">{{ slotProps.data.title }}</div>
-                                    <Chart type="pie" :data="slotProps.data" :options="pieOptions">{{title}}</Chart>
+                                    <Chart type="doughnut" :data="slotProps.data" :options="pieOptions">{{title}}</Chart>
+                                    <!-- <div class="flex align-items-center justify-content-between" v-if="slotProps.data.totalCount == 0">No answers yet :/</div> -->
                                     <div class="mb-3">{{ slotProps.data.description }}</div>
                                 </div>
                                 <Divider class="mt-0 mr-0 ml-0 mb-2" layout="horizontal" align="center">
@@ -291,7 +221,7 @@ eventBus.on("SearchPostsQueryEvent", async (data) => {
                                 </Divider>
                                 <div>
                                     <div class="flex align-items-center justify-content-between">
-                                        <div class="flex align-items-center">
+                                        <div class="flex align-items-center" @click.stop="stopPropagation" @click="routeToProfile(slotProps.data.author.id)">
                                             <Avatar :image="slotProps.data.author.avatarLink" class="mr" size="large" shape="circle"></Avatar>
                                             <span class="text-l ml-2">{{ slotProps.data.author.name }}</span>        
                                         </div>

@@ -40,7 +40,7 @@ onMounted(() => {
     const token = store.getters.getToken
     console.log(token);
     if(token != null) {
-        router.push("/poolhub"); 
+        router.push("/"); 
     }
 });
 

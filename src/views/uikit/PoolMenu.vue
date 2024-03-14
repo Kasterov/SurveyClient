@@ -30,6 +30,10 @@ const deletePostById = async () => {
     deleteProductDialog.value = false;
 };
 
+const editProduct = async (postId) => {
+    router.push(`/pool-edit/${postId}`);
+};
+
 onMounted(() => {
     loading.value = true;
 
@@ -77,10 +81,6 @@ const loadLazyData = async (event) => {
     loading.value = false;
 };
 
-const onSearchInput = (event) => {
-    loadLazyData(event);
-}
-
 const onPage = (event) => {
     lazyParams.value = event;
     loadLazyData(event);
@@ -115,13 +115,19 @@ const onFilter = (event) => {
                     v-model:selection="selectedCustomers">
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
-                            <router-link to="/createpool" target="_blank">
+                            <router-link to="/pool-create" target="_blank">
                                 <Button type="button" icon="pi pi-plus" label="Create pool" class="p-button-outlined mb-2"/>
                             </router-link>
-                            <span class="p-input-icon-left mb-2">
+                            <div class="p-inputgroup" style="width: 70%">
+                                <span class="p-inputgroup-addon" style="cursor: pointer;" @click="loadLazyData">
+                                    <i class="pi pi-search"></i>
+                                </span>
+                                <InputText placeholder="Start typing..." @keyup.enter="loadLazyData" v-model="searchText"/>
+                            </div>
+                            <!-- <span class="p-input-icon-left mb-2">
                                 <i class="pi pi-search" />
                                 <InputText placeholder="Search" style="width: 100%" v-model="searchText" @input="onSearchInput"/>
-                            </span>
+                            </span> -->
                         </div>
                     </template>
                     <Column field="title" header="Title" :sortable="false   " headerStyle="width:20%; min-width:10rem;">
@@ -156,7 +162,7 @@ const onFilter = (event) => {
                     </Column>
                     <Column field="options" headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-primary mr-2" @click="editProduct(slotProps.data)" />
+                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-primary mr-2" @click="editProduct(slotProps.data.id)" />
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-info mt-2" @click="confirmDeletePostModal(slotProps.data.id)" />
                         </template>
                     </Column>

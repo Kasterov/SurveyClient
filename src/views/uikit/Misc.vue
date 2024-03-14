@@ -25,6 +25,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
     endProgress();
 });
+
 </script>
 
 <template>

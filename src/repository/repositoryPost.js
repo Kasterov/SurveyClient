@@ -2,6 +2,7 @@ import axios from 'axios';
 import store from '@/store';
 import router from '@/router/index.js'
 import { useToast } from 'primevue/usetoast';
+import apiUrl from '@/config.js';
 
 export function repositoryPost() {
     // const toast = useToast();
@@ -33,7 +34,7 @@ export function repositoryPost() {
     };
 
     const getLitePostById = async (id) => {
-        let res = await axios.get(`https://localhost:7213/Post/postlite?id=${id}`)
+        let res = await axios.get(`${apiUrl}Post/post-full?id=${id}`)
         .catch(error => {
             handleRequestError(error);
         });
@@ -42,7 +43,7 @@ export function repositoryPost() {
     };
 
     const getLitePostList = async (paginationReqeust) => {
-        let res = await axios.get(`https://localhost:7213/Post/post-lite-list`,
+        let res = await axios.get(`${apiUrl}Post/post-lite-list`,
         {
             params: paginationReqeust,
             headers: {
@@ -59,7 +60,7 @@ export function repositoryPost() {
 
     const getPostMenu = async (params) => {
         const token = store.getters.getToken
-        let res = await axios.get(`https://localhost:7213/Post/post-menu`,
+        let res = await axios.get(`${apiUrl}Post/post-menu`,
         {
             params: params,
             headers: {
@@ -79,7 +80,7 @@ export function repositoryPost() {
         const token = store.getters.getToken
         let auth = token != null ? `Bearer ${token}` : '';
 
-        let res = await axios.get(`https://localhost:7213/Post/pool-option-list?id=${id}`,
+        let res = await axios.get(`${apiUrl}Post/pool-option-list?id=${id}`,
         {
             headers: {
                 'Content-Type': 'application/json-patch+json',
@@ -97,7 +98,7 @@ export function repositoryPost() {
     const createPost = async (createPostDTO) => {
         const token = store.getters.getToken
         let res = await axios.post(
-            'https://localhost:7213/Post/post',
+            `${apiUrl}Post/post`,
             createPostDTO,
             {
                 headers: {
@@ -117,12 +118,44 @@ export function repositoryPost() {
         return null;
     };
 
+    const editPost = async (editPostDTO) => {
+        const token = store.getters.getToken
+        let res = await axios.put(
+            `${apiUrl}Post/post`,
+            editPostDTO,
+            {
+                headers: {
+                    'Content-Type': 'application/json-patch+json',
+                    'accept': '*/*',
+                    'Authorization': `Bearer ${token}`
+                  }
+            }
+        ).catch(error => {
+            handleRequestError(error);
+        });
+        
+        if(res){
+            return res.data; 
+        }
+
+        return null;
+    };
+
+    const getPostForEdit = async (postId) => {
+        let res = await axios.get(`${apiUrl}Post/post?id=${postId}`)
+        .catch(error => {
+            handleRequestError(error);
+        });
+        
+        return res.data;
+    };
+
     const deletePost = async (id) => {
         const token = store.getters.getToken;
     
         try {
             const res = await axios.delete(
-                `https://localhost:7213/Post/post?id=${id}`,
+                `${apiUrl}Post/post?id=${id}`,
                 {
                     headers: {
                         'Content-Type': 'application/json-patch+json',
@@ -144,6 +177,8 @@ export function repositoryPost() {
             createPost: createPost,
             getPoolOptionListByPostId: getPoolOptionListByPostId,
             getPostMenu: getPostMenu,
-            deletePost: deletePost
+            deletePost: deletePost,
+            editPost: editPost,
+            getPostForEdit: getPostForEdit
         }
 };

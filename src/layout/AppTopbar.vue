@@ -72,26 +72,31 @@ const searchPostInput = ref('');
 
 <template>
     <div class="layout-topbar">
-        <router-link to="/" class="layout-topbar-logo">
-            <!-- <img :src="logoUrl" alt="logo" /> -->
-            <span>Survey</span>
-        </router-link>
+        <div class="layout-topbar-logo">
+            <router-link to="/">
+                <span>Survey</span>
+            </router-link>
+        </div>
 
-        <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
-            <i class="pi pi-bars"></i>
-        </button>
+        <div class="p-inputgroup search-topbar" v-if="router.currentRoute.value.path === '/'">
+            <span class="p-inputgroup-addon" style="cursor: pointer;" @click="searchButton">
+                <i class="pi pi-search"></i>
+            </span>
+            <InputText placeholder="Start typing..." @keyup.enter="searchButton" v-model="searchPostInput"/>
+        </div>
 
-        <span class="p-input-icon-left mb-2">
-            <i class="pi pi-search" />
-            <InputText placeholder="Search" style="width: 100%" v-model="searchPostInput"/>
-        </span>
+        <!-- <div class="p-inputgroup search-topbar" v-if="router.currentRoute.value.path === '/'">
+            <Button label="Search" @click="searchButton"/>
+            <InputText placeholder="What are you looking for?" @keyup.enter="searchButton" v-model="searchPostInput"/>
+        </div> -->
 
-        <button class="p-link layout-menu-button layout-topbar-button" @click="searchButton">Search</button>
-
-        <div class="layout-topbar-menu" :class="topbarMenuClasses">
+        <div class="layout-topbar-right-side" :class="topbarMenuClasses">
             <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
+            </button>
+            <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
+                <i class="pi pi-bars"></i>
             </button>
         </div>
     </div>

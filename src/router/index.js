@@ -9,14 +9,24 @@ const router = createRouter({
             component: AppLayout,
             children: [
                 {
-                    path: '/',
-                    name: 'dashboard',
+                    path: '/statistic',
+                    name: 'statistic',
                     component: () => import('@/views/Dashboard.vue')
+                },
+                {
+                    path: '/',
+                    name: 'main',
+                    component: () => import('@/views/uikit/PoolHub.vue')
                 },
                 {
                     path: '/profile',
                     name: 'profile',
                     component: () => import('@/views/uikit/Profile.vue')
+                },
+                {
+                    path: '/profile-view/:id',
+                    name: 'profile-view',
+                    component: () => import('@/views/uikit/ProfileView.vue')
                 },
                 {
                     path: '/uikit/formlayout',
@@ -112,22 +122,22 @@ const router = createRouter({
                     component: () => import('@/views/uikit/Chart.vue')
                 },
                 {
-                    path: '/uikit/customcharts/:id',
-                    name: 'customcharts',
-                    component: () => import('@/views/uikit/CustomChart.vue')
+                    path: '/pool/:id',
+                    name: 'pool',
+                    component: () => import('@/views/uikit/Pool.vue')
                 },
                 {
-                    path: '/poolhub',
-                    name: 'poolhub',
-                    component: () => import('@/views/uikit/PoolHub.vue')
+                    path: '/pool-edit/:id',
+                    name: 'editPool',
+                    component: () => import('@/views/uikit/EditPool.vue')
                 },
                 {
-                    path: '/poolmenu',
+                    path: '/pool-menu',
                     name: 'poolmenu',
                     component: () => import('@/views/uikit/PoolMenu.vue')
                 },
                 {
-                    path: '/createpool',
+                    path: '/pool-create',
                     name: 'createpool',
                     component: () => import('@/views/uikit/CreatePool.vue')
                 },

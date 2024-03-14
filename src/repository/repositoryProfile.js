@@ -1,6 +1,7 @@
 import axios from 'axios';
 import store from '@/store';
 import router from '@/router/index.js'
+import apiUrl from '@/config.js';
 
 export function repositoryProfile() {
     const handleRequestError = (error) => {
@@ -31,7 +32,7 @@ export function repositoryProfile() {
     };
 
     const getListJob = async () => {
-        let res = await axios.get(`https://localhost:7213/Job/jobs`)
+        let res = await axios.get(`${apiUrl}Job/jobs`)
         .catch(error => {
             handleRequestError(error);
         });
@@ -40,7 +41,7 @@ export function repositoryProfile() {
     };
 
     const getListEducation = async () => {
-        let res = await axios.get(`https://localhost:7213/Education/educations`)
+        let res = await axios.get(`${apiUrl}Education/educations`)
         .catch(error => {
             handleRequestError(error);
         });
@@ -49,7 +50,7 @@ export function repositoryProfile() {
     };
 
     const getListCountry = async () => {
-        let res = await axios.get(`https://localhost:7213/Country/countries`)
+        let res = await axios.get(`${apiUrl}Country/countries`)
         .catch(error => {
             handleRequestError(error);
         });
@@ -58,7 +59,7 @@ export function repositoryProfile() {
     };
 
     const getListHobby = async () => {
-        let res = await axios.get(`https://localhost:7213/Hobby/hobbies`)
+        let res = await axios.get(`${apiUrl}Hobby/hobbies`)
         .catch(error => {
             handleRequestError(error);
         });
@@ -92,7 +93,7 @@ export function repositoryProfile() {
     const getProfileByUserId = async () => {
         const token = store.getters.getToken
         let res = await axios.get(
-            'https://localhost:7213/Profile/profile',
+            `${apiUrl}Profile/profile`,
             {
                 headers: {
                     'Content-Type': 'application/json-patch+json',
