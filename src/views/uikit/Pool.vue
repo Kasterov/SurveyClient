@@ -59,8 +59,6 @@ const setChart = async () => {
         ]
     };
 
-    console.log(author.value);
-
     pieOptions.value = {
         plugins: {
             legend: {

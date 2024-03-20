@@ -160,6 +160,12 @@ const onFilter = (event) => {
                             {{ DateTime.fromJSDate(new Date(slotProps.data.created)).toFormat('dd LLLL yyyy') }}
                         </template>
                     </Column>
+                    <Column field="lastModified" header="LastModified" :sortable="false" headerStyle="width:20%; min-width:10rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">LastModified</span>
+                            {{ DateTime.fromJSDate(new Date(slotProps.data.lastModified)).toFormat('dd LLLL yyyy') }}
+                        </template>
+                    </Column>
                     <Column field="options" headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-primary mr-2" @click="editProduct(slotProps.data.id)" />

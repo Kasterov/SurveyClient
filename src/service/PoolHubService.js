@@ -31,8 +31,8 @@ export default class PoolhubService {
                 datasets: [
                     {
                         data: pool.votes.map(x => x.count),
-                        backgroundColor: [documentStyle.getPropertyValue('--indigo-800'), documentStyle.getPropertyValue('--teal-600'), documentStyle.getPropertyValue('--primary-600'),  documentStyle.getPropertyValue('--purple-800')],
-                        hoverBackgroundColor: [documentStyle.getPropertyValue('--indigo-700'), documentStyle.getPropertyValue('--teal-500'), documentStyle.getPropertyValue('--primary-500'),  documentStyle.getPropertyValue('--purple-700')]
+                        backgroundColor: [documentStyle.getPropertyValue('--blue-700'), documentStyle.getPropertyValue('--red-700'), documentStyle.getPropertyValue('--green-700'),  documentStyle.getPropertyValue('--purple-700'),  documentStyle.getPropertyValue('--indigo-700'), documentStyle.getPropertyValue('--pink-700'), documentStyle.getPropertyValue('--orange-700')],
+                        hoverBackgroundColor: [documentStyle.getPropertyValue('--blue-600'), documentStyle.getPropertyValue('--red-600'), documentStyle.getPropertyValue('--green-600'),  documentStyle.getPropertyValue('--purple-600'),  documentStyle.getPropertyValue('--indigo-600'), documentStyle.getPropertyValue('--pink-600'), documentStyle.getPropertyValue('--orange-600')]
                     }
                 ],
             }; 

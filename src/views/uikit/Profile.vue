@@ -29,13 +29,7 @@ const relationships = ref([
 const relationship = ref(null);
 const submitted = ref(false);
 
-const sallaryGrades = ref([
-    {status: "Up to 400 $", value: 1},
-    {status: "Up to 2000 $", value: 2},
-    {status: "Up to 5000 $", value: 3},
-    {status: "More then 5000 $", value: 4}
-]);
-const sallaryGrade = ref(null);
+const spendingPerMonth = ref(null);
 
 const country = ref(null);
 const countries = ref([]);
@@ -174,7 +168,7 @@ const uploadProfileDTO = async() => {
             gender: gender.value?.value,
             bio: bio.value,
             relationship: relationship.value?.value,
-            sallary: sallaryGrade.value?.value,
+            spendingPerMonth: spendingPerMonth.value,
             avatar: avatarToUpload,
             countryId: country.value?.id,
             jobs: jobs.value.map(j => ({jobId: j.id})),
@@ -215,10 +209,6 @@ const customBase64Uploader = async (event) => {
     };
 };
 
-const handleDropdownChange = () => {
-      console.log('Изменение в модели sallaryGrade:', sallaryGrade.value);
-    }
-
 onMounted(async () => {
     jobList.value = await getListJob();
     jobList.value.forEach(job => {
@@ -242,13 +232,13 @@ onMounted(async () => {
     name.value = profileExistData.name;
     email.value = profileExistData.email;
     dateOfBirth.value = new Date(profileExistData.dateOfBirth);
+    spendingPerMonth.value = profileExistData.spendingPerMonth;
 
-    sallaryGrade.value = sallaryGrades.value.filter(s => s.value == profileExistData.sallary)[0];
     relationship.value = relationships.value.filter(s => s.value == profileExistData.relationship)[0];
     gender.value = genders.value.filter(s => s.value == profileExistData.gender)[0];
     country.value = countries.value.filter(s => s.id == profileExistData.country?.id)[0];
-    uploadedImage.value = profileExistData.fileEntityLink;
-    idOfAvatar.value = profileExistData.fileEntityId;
+    uploadedImage.value = profileExistData.avatarLink;
+    idOfAvatar.value = profileExistData.avatarId;
 
     addEducationList(profileExistData.educations);
     addJobList(profileExistData.jobs);
@@ -345,8 +335,9 @@ onMounted(async () => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <span class="p-float-label">
-                            <Dropdown id="dropdown" @change="handleDropdownChange" :options="sallaryGrades" v-model="sallaryGrade" optionLabel="status"></Dropdown>
-                            <label for="dropdown">Spending per month</label>
+                            <InputText v-model.number="spendingPerMonth" />
+                            <Slider v-model="spendingPerMonth" :max="5000" :step="100"/>
+                            <label for="dropdown">Spending pre month $</label>
                         </span>
                     </div>
                 </div>

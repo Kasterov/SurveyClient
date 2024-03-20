@@ -3,11 +3,14 @@ import { ref, onMounted } from 'vue';
 import PoolhubService from '@/service/PoolhubService';
 import { repositoryPost } from '@/repository/repositoryPost';
 import { repositoryVote } from '@/repository/repositoryVote';
+import { useToast } from 'primevue/usetoast';
 import { DateTime  } from 'luxon';
 import ProgressSpinner from 'primevue/progressspinner';
 import { watch } from 'vue';
 import eventBus from '@/event-bus.js'
 import { useRouter } from 'vue-router'
+
+const toast = useToast();
 
 const router = useRouter();
 const { getPoolOptionListByPostId } = repositoryPost();
@@ -23,7 +26,6 @@ const isMultiple = ref(false);
 const dataviewValue = ref(null);
 const layout = ref('grid');
 const scrolled = ref(true);
-
 const postCount = ref(1);
 
 const customLazyParams = ref({pageSize: 6, page: 1});
@@ -45,6 +47,42 @@ const handleScroll = async (event) => {
         dataviewValue.value = dataviewValue.value.concat(mappedPagnationResponseDTO.responseList);
     } 
 }
+
+const menuExprot = () => {
+    console.log("export");
+}
+
+const menuComplain = () => {
+    console.log("complain");
+}
+
+const menuSave = () => {
+    console.log("save");
+}
+
+const overlayMenuMoreItems = ref([
+    {
+        label: 'Export',
+        icon: 'pi pi-file-export',
+        command: menuExprot
+    },
+    {
+        label: 'Сomplain',
+        icon: 'pi pi-flag',
+        command: menuComplain
+    },
+    {
+        label: 'Save',
+        icon: 'pi pi-bookmark',
+        command: menuSave
+    }
+]);
+
+const menu = ref(null);
+
+const toggleMenuMore = (event) => {
+    menu.value.toggle(event);
+};
 
 const poolOptionsModal = ref(null);
 
@@ -70,7 +108,7 @@ const vote = async (postId) => {
         voteIdList: radioValue.value ? [radioValue.value] : checkboxValue.value
     }
 
-    await createVoteList(createVoteListDTO);
+    let res = await createVoteList(createVoteListDTO);
     loadingVoteButton.value = false
 
     dataviewValue.value
@@ -102,6 +140,10 @@ const vote = async (postId) => {
     display.value = false;
     radioValue.value = null;
     checkboxValue.value = [];
+
+    if(res){
+        toast.add({ severity: 'success', summary: 'Voted', life: 1000 });
+    }
 };
 
 const display = ref(false);
@@ -145,6 +187,12 @@ const routeToPost = (id) => {
 const routeToProfile = (id) => {
     router.push({ path: `/profile-view/${id}` });
 };
+
+const copyUrl = (id) => {
+    const currentUrl = window.location.href;
+    navigator.clipboard.writeText(`${currentUrl}pool/${id}`);
+    toast.add({ severity: 'success', summary: 'Link copied', life: 1000 });   
+}
 
 const stopPropagation = (event) => {
       event.stopPropagation(); 
@@ -227,9 +275,10 @@ eventBus.on("SearchPostsQueryEvent", async (data) => {
                                         </div>
                                         <span class="text-l ml-2">{{ DateTime.fromJSDate(new Date(slotProps.data.created)).setLocale("en").toRelative()}}</span>
                                     </div>
-                                    <div class="flex align-items-center justify-content-between mt-1" v-if="true">
-                                        <Button class="p-button-rounded p-button-info p-button-text" label="more" icon="pi pi-ellipsis-h" @click.stop="stopPropagation" />
-                                        <Button class="p-button-rounded p-button-info p-button-text" label="share" icon="pi pi-arrow-circle-up" @click.stop="stopPropagation" />
+                                    <div class="flex align-items-center justify-content-between mt-1">
+                                        <Button class="p-button-rounded p-button-info p-button-text" label="more" icon="pi pi-ellipsis-h" @click="toggleMenuMore" @click.stop="stopPropagation" />
+                                        <Menu ref="menu" :model="overlayMenuMoreItems" :popup="true" />
+                                        <Button class="p-button-rounded p-button-info p-button-text" label="share" icon="pi pi-send" @click="copyUrl(slotProps.data.id)" @click.stop="stopPropagation" />
                                         <Button icon="pi pi-chart-pie" label="vote" class="p-button-rounded p-button-text" @click.stop="stopPropagation" @click="open(slotProps.data.id)"/>
                                         <!-- <Button class="p-button-rounded p-button-sm" label="" icon="pi pi-chart-pie" style="width: auto" @click.stop="stopPropagation" @click="open(slotProps.data.id)" /> -->
                                     </div>

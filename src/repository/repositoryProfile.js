@@ -70,7 +70,7 @@ export function repositoryProfile() {
     const addProfileData = async (profileDTO) => {
         const token = store.getters.getToken
         let res = await axios.post(
-            'https://localhost:7213/Profile/profile',
+            'https://localhost:7213/User/profile',
             profileDTO,
             {
                 headers: {
@@ -93,7 +93,7 @@ export function repositoryProfile() {
     const getProfileByUserId = async () => {
         const token = store.getters.getToken
         let res = await axios.get(
-            `${apiUrl}Profile/profile`,
+            `${apiUrl}User/profile`,
             {
                 headers: {
                     'Content-Type': 'application/json-patch+json',

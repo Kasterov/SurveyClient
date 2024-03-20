@@ -16,7 +16,7 @@ onBeforeMount(async () => {
     let _userData = await getProfileViewData(route.params.id);
 
     userData.value = {
-        avatar: _userData.fileEntityLink,
+        avatar: _userData.avatarLink,
         name: _userData.name,
         bio: _userData.bio,
         country: _userData.country.countryCode,
