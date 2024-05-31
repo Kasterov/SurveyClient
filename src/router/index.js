@@ -200,7 +200,11 @@ const router = createRouter({
             name: 'signup',
             component: () => import('@/views/pages/auth/SignUp.vue')
         },
-
+        {
+            path: '/verify-email/:code',
+            name: 'verifyEmail',
+            component: () => import('@/views/uikit/VerifyEmail.vue')
+        },
         {
             path: '/auth/access',
             name: 'accessDenied',

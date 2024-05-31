@@ -56,7 +56,29 @@ export function repositoryUser() {
         return res.data;
     };
 
+    const verifyEmail = async (code) => {
+        let res = await axios.post(
+            `${apiUrl}User/verify-email`,
+            code,
+            {
+                headers: {
+                    'Content-Type': 'application/json-patch+json',
+                    'accept': '*/*'
+                }
+            }
+        ).catch(error => {
+            console.error('Error occured:', error);
+        });
+
+        if(res.data){
+            return true; 
+        } else {
+            return false;
+        }
+    };
+
     return {
+        verifyEmail: verifyEmail,
         getProfileViewData: getProfileViewData,
         registerUser: registerUser,
         signInUser: signInUser

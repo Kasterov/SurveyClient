@@ -3,18 +3,22 @@ import { ref, onMounted } from 'vue';
 import PoolhubService from '@/service/PoolhubService';
 import { repositoryPost } from '@/repository/repositoryPost';
 import { repositoryVote } from '@/repository/repositoryVote';
+import { repositorySavedPost } from '@/repository/repositorySavedPost';
 import { useToast } from 'primevue/usetoast';
 import { DateTime  } from 'luxon';
 import ProgressSpinner from 'primevue/progressspinner';
 import { watch } from 'vue';
 import eventBus from '@/event-bus.js'
 import { useRouter } from 'vue-router'
+import { repositoryComplain } from '@/repository/repositoryComplain';
 
+const { createComplain } = repositoryComplain();
 const toast = useToast();
 
 const router = useRouter();
 const { getPoolOptionListByPostId } = repositoryPost();
 const { createVoteList } = repositoryVote();
+const { createSavedPost, isSavedPost } = repositorySavedPost();
 
 let documentStyle = getComputedStyle(document.documentElement);
 let textColor = documentStyle.getPropertyValue('--text-color');
@@ -48,17 +52,64 @@ const handleScroll = async (event) => {
     } 
 }
 
+const menuPoolId = ref(null);
+const commentComplain = ref(null);
+
 const menuExprot = () => {
-    console.log("export");
+    console.log(menuPoolId.value);
 }
 
 const menuComplain = () => {
-    console.log("complain");
+    displayMenu.value = true; 
+    console.log(menuPoolId.value);
 }
 
-const menuSave = () => {
-    console.log("save");
+const menuSave = async () => {
+    var res = await createSavedPost({postId: menuPoolId.value});
+
+    if(res == true){
+        toast.add({ severity: 'success', summary: 'Post saved!', life: 1000 });
+    }
+    else {
+        toast.add({ severity: 'error', summary: 'Error in post saving!', life: 1000 });
+    }
 }
+
+const complainSendButtonLoading = ref(false);
+
+const sendComplain = async () => {
+    complainSendButtonLoading.value = true;
+
+    let complainDTO = {
+        postId: menuPoolId.value,
+        comment: commentComplain.value,
+        complainReason: complainReason.value.value
+    };
+
+    let res = await createComplain(complainDTO);
+
+    if(res == true){
+        complainSendButtonLoading.value = false;
+        displayMenu.value = true;
+        toast.add({ severity: 'success', summary: 'Complain sended! Thanks!', life: 1000 });
+    }
+    else {
+        complainSendButtonLoading.value = false;
+        toast.add({ severity: 'error', summary: 'Error in complain sending!', life: 1000 });
+    }
+}
+
+const complainReasons = ref([
+    { name: 'Inappropriate content', value: 0 },
+    { name: 'Violence', value: 1 },
+    { name: 'Terrorism', value: 2 },
+    { name: 'Propaganda', value: 3 },
+    { name: 'Violation of law', value: 4 },
+    { name: 'Religious appeasement', value: 5 },
+    { name: 'Other', value: 6 },
+]);
+
+const complainReason = ref(complainReasons.value[0]);
 
 const overlayMenuMoreItems = ref([
     {
@@ -75,13 +126,22 @@ const overlayMenuMoreItems = ref([
         label: 'Save',
         icon: 'pi pi-bookmark',
         command: menuSave
-    }
-]);
+    }]);
 
 const menu = ref(null);
 
-const toggleMenuMore = (event) => {
+const isPostSaved = ref(false);
+
+const toggleMenuMore = async (event, _menuPoolId) => {
+    // console.log(menu.value);
+    //var res = await isSavedPost(_menuPoolId);
+    // if (menu.value && menu.value.toggle) {
+    //     console.log(menu.value);
+    //     menu.value.toggle(event);
+    // }
+
     menu.value.toggle(event);
+    menuPoolId.value = _menuPoolId;
 };
 
 const poolOptionsModal = ref(null);
@@ -146,6 +206,7 @@ const vote = async (postId) => {
     }
 };
 
+const displayMenu = ref(false);
 const display = ref(false);
 const isPostRevotable = ref(false);
 const isPostVoted = ref(false);
@@ -250,6 +311,25 @@ eventBus.on("SearchPostsQueryEvent", async (data) => {
             <Button v-if="!isPostVoted || isPostRevotable" label="Vote" :loading="loadingVoteButton" @click="vote(poolOptionsModal.id)" icon="pi pi-check" class="p-button-outlined"/>
         </template>
     </Dialog>
+    <Dialog header="Create complain" v-model:visible="displayMenu" :breakpoints="{ '960px': '75vw' }" :style="{ width: '30vw' }" :modal="true">
+        <div class="grid mt-1">
+            <div class="col-12 md:col-12">
+                <span class="p-float-label">
+                    <Dropdown id="complainReasons" :options="complainReasons" v-model="complainReason" optionLabel="name"></Dropdown>
+                    <label for="complainReasons">Reason</label>
+                </span>
+            </div>
+            <div class="col-12 md:col-12">
+                <span class="p-float-label">
+                    <Textarea inputId="textarea" rows="3" cols="25" v-model="commentComplain"></Textarea>
+                    <label for="textarea">Description (optional)</label>
+                </span>
+            </div>
+        </div>
+        <template #footer>
+            <Button label="Send complain" :loading="complainSendButtonLoading" @click="sendComplain" icon="pi pi-flag-fill" class="p-button-outlined"/>
+        </template>
+    </Dialog>
     <div class="grid">
         <div class="col-12">
             <div class="card">
@@ -276,8 +356,8 @@ eventBus.on("SearchPostsQueryEvent", async (data) => {
                                         <span class="text-l ml-2">{{ DateTime.fromJSDate(new Date(slotProps.data.created)).setLocale("en").toRelative()}}</span>
                                     </div>
                                     <div class="flex align-items-center justify-content-between mt-1">
-                                        <Button class="p-button-rounded p-button-info p-button-text" label="more" icon="pi pi-ellipsis-h" @click="toggleMenuMore" @click.stop="stopPropagation" />
-                                        <Menu ref="menu" :model="overlayMenuMoreItems" :popup="true" />
+                                        <Button class="p-button-rounded p-button-info p-button-text" label="more" icon="pi pi-ellipsis-h" @click="(event) => toggleMenuMore(event, slotProps.data.id)" @click.stop="stopPropagation" />
+                                        <Menu ref="menu" :model="overlayMenuMoreItems" :popup="true"/>
                                         <Button class="p-button-rounded p-button-info p-button-text" label="share" icon="pi pi-send" @click="copyUrl(slotProps.data.id)" @click.stop="stopPropagation" />
                                         <Button icon="pi pi-chart-pie" label="vote" class="p-button-rounded p-button-text" @click.stop="stopPropagation" @click="open(slotProps.data.id)"/>
                                         <!-- <Button class="p-button-rounded p-button-sm" label="" icon="pi pi-chart-pie" style="width: auto" @click.stop="stopPropagation" @click="open(slotProps.data.id)" /> -->

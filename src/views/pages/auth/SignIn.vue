@@ -26,7 +26,7 @@ const signInUserWithDTO = async () => {
     loadingSignInButton.value = false;
 
     if(isSignedIn) {
-        router.go(-1);
+        router.push('/');
     }
     else {
         toast.add({ severity: 'error', summary: 'Filed to sign in!', detail: 'Wrong user name or paasword', life: 3000 });

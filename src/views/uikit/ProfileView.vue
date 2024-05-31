@@ -12,6 +12,7 @@ const countryCodeIcon = ref("");
 
 const educationList = ref(["Software developer", "Recruties spesialist"]);
 
+
 onBeforeMount(async () => {
     let _userData = await getProfileViewData(route.params.id);
 

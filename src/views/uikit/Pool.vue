@@ -13,7 +13,6 @@ let textColor = documentStyle.getPropertyValue('--text-color');
 let textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
 let surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-const pieData = ref(null);
 const pieOptions = ref(null);
 const title = ref(null);
 const description = ref(null);
@@ -27,6 +26,41 @@ const author = ref({
     avatarLink: null
 });
 const totalCount = ref(null);
+
+const barData = ref({});
+
+const barOptions = {
+    plugins: {
+            legend: {
+                labels: {
+                    fontColor: textColor
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    color: textColorSecondary,
+                    font: {
+                        weight: 500
+                    }
+                },
+                grid: {
+                    display: false,
+                    drawBorder: false
+                }
+            },
+            y: {
+                ticks: {
+                    color: textColorSecondary
+                },
+                grid: {
+                    color: surfaceBorder,
+                    drawBorder: false
+                }
+            }
+        }
+}
 
 const setColorOptions = () => {
     documentStyle = getComputedStyle(document.documentElement);
@@ -48,28 +82,19 @@ const setChart = async () => {
     author.value = res.author;
     totalCount.value = res.totalCount;
 
-    pieData.value = {
+    barData.value = {
         labels: res.votes.map(x => x.option),
         datasets: [
             {
-                data: res.votes.map(x => x.count),
-                backgroundColor: [documentStyle.getPropertyValue('--indigo-800'), documentStyle.getPropertyValue('--teal-600'), documentStyle.getPropertyValue('--primary-600'),  documentStyle.getPropertyValue('--purple-800')],
-                hoverBackgroundColor: [documentStyle.getPropertyValue('--indigo-700'), documentStyle.getPropertyValue('--teal-500'), documentStyle.getPropertyValue('--primary-500'),  documentStyle.getPropertyValue('--purple-700')]
+                label: 'Pool analytics',
+                backgroundColor: [documentStyle.getPropertyValue('--blue-700'), documentStyle.getPropertyValue('--red-700'), documentStyle.getPropertyValue('--green-700'),  documentStyle.getPropertyValue('--purple-700'),  documentStyle.getPropertyValue('--indigo-700'), documentStyle.getPropertyValue('--pink-700'), documentStyle.getPropertyValue('--orange-700')],
+                hoverBackgroundColor: [documentStyle.getPropertyValue('--blue-600'), documentStyle.getPropertyValue('--red-600'), documentStyle.getPropertyValue('--green-600'),  documentStyle.getPropertyValue('--purple-600'),  documentStyle.getPropertyValue('--indigo-600'), documentStyle.getPropertyValue('--pink-600'), documentStyle.getPropertyValue('--orange-600')],
+                data: res.votes.map(x => x.count)
             }
         ]
-    };
-
-    pieOptions.value = {
-        plugins: {
-            legend: {
-                labels: {
-                    usePointStyle: true,
-                    color: textColor
-                }
-            }
-        }
-    };
+    }
 };
+
 watch(
     layoutConfig.theme,
     () => {
@@ -125,8 +150,8 @@ const calculatePrecente = (count) => {
             </div>
         <div class="col-12 xl:col-12">
             <Panel :header="'Pool results - ' + totalCount + ' votes'" :toggleable="true">
-                <div v-for="(poolOption, index) in poolOptions" :key="index" class="field col-12 md:col-6">
-                    <div class="text-left w-full text-xl">{{poolOption.option }} - <Badge :value="calculatePrecente(poolOption.count)" size="large" severity="info"></Badge></div>
+                <div class="field col-12 md:col-6">
+                    <Chart type="bar" :data="barData" :options="barOptions"></Chart>
                 </div>
             </Panel>
         </div>
